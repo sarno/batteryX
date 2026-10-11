@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: macos-14
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Show Swift & macOS Info
+        run: |
+          swift --version
+          xcodebuild -version
+
+      - name: Run Verification Suite
+        run: swift run BatteryXTestRunner
+
+      - name: Build Standalone App & DMG
+        run: |
+          chmod +x Scripts/*.sh
+          ./Scripts/create_dmg.sh
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "BatteryX ${{ github.ref_name }}"
+          files: |
+            dist/BatteryX.dmg
+          generate_release_notes: true
+          draft: false
+          prerelease: false
