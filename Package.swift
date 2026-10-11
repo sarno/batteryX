@@ -24,8 +24,13 @@ let package = Package(
     dependencies: [],
     targets: [
         .target(
+            name: "CSMCBridge",
+            path: "Sources/CSMCBridge",
+            publicHeadersPath: "include"
+        ),
+        .target(
             name: "BatteryXCore",
-            dependencies: [],
+            dependencies: ["CSMCBridge"],
             path: "Sources/BatteryXCore"
         ),
         .executableTarget(

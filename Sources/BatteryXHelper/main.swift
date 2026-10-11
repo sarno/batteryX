@@ -1,11 +1,9 @@
 import Foundation
 import BatteryXCore
+import Darwin
 
-// Privileged CLI Helper for root execution:
-// Usage:
-//   sudo batteryx-helper get-limit
-//   sudo batteryx-helper set-limit 80
-//   sudo batteryx-helper reset
+// Ensure effective user id 0 is converted to real uid 0 for macOS IOKit authorization
+setuid(0)
 
 let args = CommandLine.arguments
 
