@@ -3,6 +3,9 @@ import BatteryXCore
 
 public struct PopoverDetailsView: View {
     @ObservedObject var settings = SettingsManager.shared
+    @State private var isHelperInstalled = HelperInstallerService.shared.isHelperInstalledAndValid
+    @State private var isInstallingHelper = false
+
     let batteryInfo: BatteryInfo
     let onTopUpOnce: () -> Void
     let onQuit: () -> Void
@@ -59,6 +62,41 @@ public struct PopoverDetailsView: View {
                 Spacer()
             }
             .padding(.bottom, 4)
+
+            // Helper Permission Warning Banner (If not yet installed)
+            if !isHelperInstalled {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.shield.fill")
+                        .foregroundColor(.yellow)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Izin Pembatas Baterai Diperlukan")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                        Text("Klik untuk mengaktifkan kontrol hardware SMC.")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Button(isInstallingHelper ? "Memasang..." : "Aktifkan") {
+                        isInstallingHelper = true
+                        HelperInstallerService.shared.promptAndInstallHelperIfNeeded { success in
+                            Task { @MainActor in
+                                isInstallingHelper = false
+                                isHelperInstalled = success
+                                if success {
+                                    settings.syncChargeLimiter()
+                                }
+                            }
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.mini)
+                    .disabled(isInstallingHelper)
+                }
+                .padding(8)
+                .background(Color.yellow.opacity(0.12))
+                .cornerRadius(8)
+            }
 
             Divider()
 
@@ -144,6 +182,9 @@ public struct PopoverDetailsView: View {
         }
         .padding(16)
         .frame(width: 320)
+        .onAppear {
+            isHelperInstalled = HelperInstallerService.shared.isHelperInstalledAndValid
+        }
     }
 
     private var batteryIconName: String {

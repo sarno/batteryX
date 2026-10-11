@@ -18,6 +18,23 @@ final class MenuBarController: NSObject {
         setupPopover()
         startMonitoring()
         NotificationService.shared.requestAuthorization()
+
+        // Auto-check and prompt for helper install on initial launch if not yet installed
+        checkAndPromptHelperInstall()
+    }
+
+    private func checkAndPromptHelperInstall() {
+        if !HelperInstallerService.shared.isHelperInstalledAndValid {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                HelperInstallerService.shared.promptAndInstallHelperIfNeeded { [weak self] success in
+                    Task { @MainActor [weak self] in
+                        if success {
+                            self?.settings.syncChargeLimiter()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private func setupStatusItem() {
@@ -31,7 +48,7 @@ final class MenuBarController: NSObject {
 
     private func setupPopover() {
         let popover = NSPopover()
-        popover.contentSize = NSSize(width: 320, height: 380)
+        popover.contentSize = NSSize(width: 320, height: 420)
         popover.behavior = .transient
         self.popover = popover
         updatePopoverContent()

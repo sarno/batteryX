@@ -65,10 +65,25 @@ public final class SettingsManager: ObservableObject, @unchecked Sendable {
     }
 
     public func syncChargeLimiter() {
-        if isChargeLimiterEnabled {
-            _ = ChargeLimiterService.shared.setChargeLimit(percentage: chargeLimit)
+        let helperPath = HelperInstallerService.shared.targetPath
+
+        // If privileged helper exists at /usr/local/bin/batteryx-helper, execute it!
+        if FileManager.default.fileExists(atPath: helperPath) {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: helperPath)
+            if isChargeLimiterEnabled {
+                process.arguments = ["set-limit", "\(chargeLimit)"]
+            } else {
+                process.arguments = ["reset"]
+            }
+            try? process.run()
         } else {
-            _ = ChargeLimiterService.shared.resetChargeLimit()
+            // Fallback in-process SMC attempt
+            if isChargeLimiterEnabled {
+                _ = ChargeLimiterService.shared.setChargeLimit(percentage: chargeLimit)
+            } else {
+                _ = ChargeLimiterService.shared.resetChargeLimit()
+            }
         }
     }
 }
