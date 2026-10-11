@@ -19,8 +19,22 @@ final class MenuBarController: NSObject {
         startMonitoring()
         NotificationService.shared.requestAuthorization()
 
+        // Restore and sync settings on launch (e.g. after macOS reboot / restart)
+        restoreAndSyncSettings()
+
         // Auto-check and prompt for helper install on initial launch if not yet installed
         checkAndPromptHelperInstall()
+    }
+
+    private func restoreAndSyncSettings() {
+        // Reapply hardware charge limiter (re-programs SMC BCLM after reboot)
+        settings.syncChargeLimiter()
+
+        // Sync alert engine config
+        settings.syncAlertEngine()
+
+        // Refresh launch-at-login state
+        settings.refreshLaunchAtLoginStatus()
     }
 
     private func checkAndPromptHelperInstall() {
@@ -48,7 +62,7 @@ final class MenuBarController: NSObject {
 
     private func setupPopover() {
         let popover = NSPopover()
-        popover.contentSize = NSSize(width: 320, height: 420)
+        popover.contentSize = NSSize(width: 320, height: 490)
         popover.behavior = .transient
         self.popover = popover
         updatePopoverContent()

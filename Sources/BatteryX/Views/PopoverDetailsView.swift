@@ -164,6 +164,28 @@ public struct PopoverDetailsView: View {
 
             Divider()
 
+            // Section 3: Auto-Start on macOS Restart / Login
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Label("Mulai Otomatis (Auto-Start)", systemImage: "arrow.clockwise.circle.fill")
+                        .font(.headline)
+                    Spacer()
+                    Text(settings.isLaunchAtLoginEnabled ? "Aktif" : "Mati")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundColor(settings.isLaunchAtLoginEnabled ? .green : .secondary)
+                }
+
+                Text("Otomatis aktifkan BatteryX dan proteksi baterai saat Mac dinyalakan atau restart.")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+
+                Toggle("Buka otomatis saat Mac Restart / Login", isOn: $settings.isLaunchAtLoginEnabled)
+                    .font(.caption)
+            }
+
+            Divider()
+
             // Actions & Footer
             HStack {
                 Button(action: onTopUpOnce) {
@@ -184,6 +206,7 @@ public struct PopoverDetailsView: View {
         .frame(width: 320)
         .onAppear {
             isHelperInstalled = HelperInstallerService.shared.isHelperInstalledAndValid
+            settings.refreshLaunchAtLoginStatus()
         }
     }
 

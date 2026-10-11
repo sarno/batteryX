@@ -44,6 +44,9 @@ Sebagai pengguna MacBook yang sering menjalankan beban kerja berat (Docker, IDE,
   - Batasi pengisian maksimal (misalnya berhenti di **80%**) untuk menjaga kesehatan baterai jangka panjang.
   - Daya adaptor dialihkan langsung menyuplai sistem (*pass-through bypass*), membiarkan baterai beristirahat.
   - Tombol **"Charge ke 100% Sekali"** (*Top-Up*) instan saat hendak bepergian.
+- 🔄 **Auto Reload & Auto-Start (Launch at Login)**:
+  - Otomatis aktif saat macOS dinyalakan atau restart (`SMAppService` native macOS 13+ & LaunchAgent fallback).
+  - Langsung memulihkan (*re-apply*) konfigurasi batas daya SMC dan ambang batas alarm secara otomatis begitu sistem selesai booting.
 - ⏱️ **Indikator Sisa Waktu Pemakaian (Hours & Minutes)**:
   - Menampilkan perkiraan sisa jam dan menit di Menu Bar persis seperti BatteryBoi, bukan hanya angka persentase.
 - ⚡ **Ultra Lightweight & 100% Native**:

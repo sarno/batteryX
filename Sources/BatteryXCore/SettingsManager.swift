@@ -9,6 +9,7 @@ public final class SettingsManager: ObservableObject, @unchecked Sendable {
     private let limitKey = "batteryx.chargeLimit"
     private let limiterEnabledKey = "batteryx.isChargeLimiterEnabled"
     private let soundEnabledKey = "batteryx.isSoundAlertEnabled"
+    private let launchAtLoginKey = "batteryx.isLaunchAtLoginEnabled"
 
     @Published public var warningThreshold: Int {
         didSet {
@@ -45,12 +46,35 @@ public final class SettingsManager: ObservableObject, @unchecked Sendable {
         }
     }
 
+    @Published public var isLaunchAtLoginEnabled: Bool {
+        didSet {
+            defaults.set(isLaunchAtLoginEnabled, forKey: launchAtLoginKey)
+            LaunchAtLoginService.shared.setLaunchAtLogin(enabled: isLaunchAtLoginEnabled)
+        }
+    }
+
     private init() {
         self.warningThreshold = defaults.object(forKey: warningKey) as? Int ?? 20
         self.urgentThreshold = defaults.object(forKey: urgentKey) as? Int ?? 10
         self.chargeLimit = defaults.object(forKey: limitKey) as? Int ?? 80
         self.isChargeLimiterEnabled = defaults.object(forKey: limiterEnabledKey) as? Bool ?? true
         self.isSoundAlertEnabled = defaults.object(forKey: soundEnabledKey) as? Bool ?? true
+
+        let savedLaunchAtLogin = defaults.object(forKey: launchAtLoginKey) as? Bool
+        let initialLaunchAtLogin = savedLaunchAtLogin ?? true
+        self.isLaunchAtLoginEnabled = initialLaunchAtLogin
+
+        if savedLaunchAtLogin == nil {
+            defaults.set(true, forKey: launchAtLoginKey)
+            LaunchAtLoginService.shared.setLaunchAtLogin(enabled: true)
+        }
+    }
+
+    public func refreshLaunchAtLoginStatus() {
+        let systemStatus = LaunchAtLoginService.shared.checkCurrentStatus()
+        if self.isLaunchAtLoginEnabled != systemStatus {
+            self.isLaunchAtLoginEnabled = systemStatus
+        }
     }
 
     public func syncAlertEngine() {
