@@ -125,8 +125,26 @@ public struct PopoverDetailsView: View {
                     step: 5
                 )
 
-                Toggle("Aktifkan Bunyi Alarm (Audio Alert)", isOn: $settings.isSoundAlertEnabled)
-                    .font(.caption)
+                HStack {
+                    Toggle("Aktifkan Bunyi Alarm & Pengingat", isOn: $settings.isSoundAlertEnabled)
+                        .font(.caption)
+
+                    Spacer()
+
+                    Button(action: {
+                        NotificationService.shared.playAttentionSound()
+                    }) {
+                        Label("Tes Bunyi", systemImage: "speaker.wave.2.fill")
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.mini)
+                }
+
+                if settings.isSoundAlertEnabled {
+                    Text("Pengingat berbunyi setiap 2 menit selama charger belum terpasang.")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
             }
 
             Divider()

@@ -27,6 +27,11 @@ cp ".build/release/batteryx-helper" "$MACOS_DIR/batteryx-helper"
 # Copy Info.plist
 cp "Resources/Info.plist" "$CONTENTS_DIR/Info.plist"
 
+# Copy AppIcon.icns
+if [ -f "Resources/AppIcon.icns" ]; then
+    cp "Resources/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+fi
+
 # Set executable permissions
 chmod +x "$MACOS_DIR/BatteryX"
 chmod +x "$MACOS_DIR/batteryx-helper"
